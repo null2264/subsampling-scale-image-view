@@ -1828,7 +1828,7 @@ public class SubsamplingScaleImageView extends View {
      */
     private float minScale() {
         boolean extra = panLimit == PAN_LIMIT_INSIDE;
-        int vExtra = extra ? Math.round(vExtraSpaceBottom + vExtraSpaceTop) : 0;
+        int vExtra = extra ? 0 : 0;
         int hExtra = extra ? Math.round(vExtraSpaceLeft + vExtraSpaceRight) : 0;
 
         int vPadding = getPaddingBottom() + getPaddingTop() + vExtra;
