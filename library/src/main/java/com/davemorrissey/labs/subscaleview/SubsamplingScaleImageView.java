@@ -200,6 +200,7 @@ public class SubsamplingScaleImageView extends View {
     private float vExtraSpaceTop;
     private float vExtraSpaceRight;
     private float vExtraSpaceBottom;
+    private boolean vExtendPastCutout;
 
     // Source coordinate to center on, used when new position is set externally before view is ready
     private Float pendingScale;
@@ -1828,7 +1829,7 @@ public class SubsamplingScaleImageView extends View {
      */
     private float minScale() {
         boolean extra = panLimit == PAN_LIMIT_INSIDE;
-        int vExtra = extra ? Math.round(vExtraSpaceBottom + vExtraSpaceTop) : 0;
+        int vExtra = extra && !vExtendPastCutout ? Math.round(vExtraSpaceBottom + vExtraSpaceTop) : 0;
         int hExtra = extra ? Math.round(vExtraSpaceLeft + vExtraSpaceRight) : 0;
 
         int vPadding = getPaddingBottom() + getPaddingTop() + vExtra;
@@ -2102,6 +2103,10 @@ public class SubsamplingScaleImageView extends View {
         vExtraSpaceTop = vTop;
         vExtraSpaceRight = vRight;
         vExtraSpaceBottom = vBottom;
+    }
+
+    public void setExtendPastCutout(boolean value) {
+        vExtendPastCutout = value;
     }
 
     /**
