@@ -28,8 +28,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.davemorrissey.labs.subscaleview.R.styleable;
-import com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder;
 import com.davemorrissey.labs.subscaleview.decoder.Decoder;
+import com.davemorrissey.labs.subscaleview.decoder.ImageDecoder;
 import com.davemorrissey.labs.subscaleview.provider.InputProvider;
 
 import java.lang.ref.WeakReference;
@@ -220,7 +220,7 @@ public class SubsamplingScaleImageView extends View {
     private GestureDetector detector;
     private GestureDetector singleDetector;
     // Tile and image decoding
-    private ImageRegionDecoder decoder;
+    private Decoder decoder;
     // Debug values
     private PointF vCenterStart;
     private float vDistStart;
@@ -304,7 +304,7 @@ public class SubsamplingScaleImageView extends View {
     }
 
     /**
-     * Get the current preferred configuration for decoding bitmaps. {@link ImageRegionDecoder}
+     * Get the current preferred configuration for decoding bitmaps. {@link Decoder}
      * instances can read this and use it when decoding images.
      *
      * @return the preferred bitmap configuration, or null if none has been set.
@@ -315,7 +315,7 @@ public class SubsamplingScaleImageView extends View {
 
     /**
      * Set a global preferred bitmap config shared by all view instances and applied to new instances
-     * initialised after the call is made. This is a hint only; the bundled {@link ImageRegionDecoder}
+     * initialised after the call is made. This is a hint only; the bundled {@link Decoder}
      * classes all respect this (except when they were constructed with
      * an instance-specific config) but custom decoder classes will not.
      *
@@ -935,7 +935,6 @@ public class SubsamplingScaleImageView extends View {
                     for (Tile tile : tileMapEntry.getValue()) {
                         if (tile.visible && (tile.loading || tile.bitmap == null)) {
                             hasMissingTiles = true;
-                            break;
                         }
                     }
                 }
@@ -1294,9 +1293,9 @@ public class SubsamplingScaleImageView extends View {
         float scaleHeight = scale * sHeight;
 
         boolean extra = panLimit == PAN_LIMIT_INSIDE;
-        float extraLeft = extra ? vExtraSpaceLeft : 0;
-        float extraRight = extra ? vExtraSpaceRight : 0;
-        float extraTop = extra ? vExtraSpaceTop : 0;
+        float extraLeft   = extra ? vExtraSpaceLeft : 0;
+        float extraRight  = extra ? vExtraSpaceRight : 0;
+        float extraTop    = extra ? vExtraSpaceTop : 0;
         float extraBottom = extra ? vExtraSpaceBottom : 0;
 
         if (panLimit == PAN_LIMIT_CENTER && isReady()) {
@@ -1411,7 +1410,7 @@ public class SubsamplingScaleImageView extends View {
     /**
      * Called by worker task when decoder is ready and image size and EXIF orientation is known.
      */
-    private synchronized void onTilesInited(ImageRegionDecoder decoder, int sWidth, int sHeight) {
+    private synchronized void onTilesInited(Decoder decoder, int sWidth, int sHeight) {
         debug("onTilesInited sWidth=%d, sHeight=%d", sWidth, sHeight);
         // If actual dimensions don't match the declared size, reset everything.
         if (this.sWidth > 0 && this.sHeight > 0 && (this.sWidth != sWidth || this.sHeight != sHeight)) {
@@ -2070,10 +2069,9 @@ public class SubsamplingScaleImageView extends View {
      * Extra space also lowers minScale.
      * Extra space is zoom-agnostic thus constant in terms of view pixels not source pixels.
      * Extra space is respected only in {@link #PAN_LIMIT_INSIDE} pan mode and ignored in others.
-     *
-     * @param vLeft   extra space on the left
-     * @param vTop    extra space on the top
-     * @param vRight  extra space on the right
+     * @param vLeft extra space on the left
+     * @param vTop extra space on the top
+     * @param vRight extra space on the right
      * @param vBottom extra space on the bottom
      */
     public void setExtraSpace(float vLeft, float vTop, float vRight, float vBottom) {
@@ -2089,7 +2087,6 @@ public class SubsamplingScaleImageView extends View {
 
     /**
      * Returns extra space for the view contained in {@link RectF}.
-     *
      * @return extra space for all sides of view in view pixels
      */
     public RectF getExtraSpace() {
@@ -2097,8 +2094,8 @@ public class SubsamplingScaleImageView extends View {
     }
 
     /**
-     * @return left extra space in view pixels
      * @see #setExtraSpace(float, float, float, float)
+     * @return left extra space in view pixels
      */
     public float getExtraSpaceLeft() {
         return vExtraSpaceLeft;
@@ -2106,7 +2103,6 @@ public class SubsamplingScaleImageView extends View {
 
     /**
      * Sets left extra space for the view in view pixels.
-     *
      * @see #setExtraSpace(float, float, float, float)
      */
     public void setExtraSpaceLeft(float vLeft) {
@@ -2114,8 +2110,8 @@ public class SubsamplingScaleImageView extends View {
     }
 
     /**
-     * @return top extra space in view pixels
      * @see #setExtraSpace(float, float, float, float)
+     * @return top extra space in view pixels
      */
     public float getExtraSpaceTop() {
         return vExtraSpaceTop;
@@ -2123,7 +2119,6 @@ public class SubsamplingScaleImageView extends View {
 
     /**
      * Sets top extra space for the view in view pixels.
-     *
      * @see #setExtraSpace(float, float, float, float)
      */
     public void setExtraSpaceTop(float vTop) {
@@ -2131,8 +2126,8 @@ public class SubsamplingScaleImageView extends View {
     }
 
     /**
-     * @return right extra space in view pixels
      * @see #setExtraSpace(float, float, float, float)
+     * @return right extra space in view pixels
      */
     public float getExtraSpaceRight() {
         return vExtraSpaceRight;
@@ -2140,7 +2135,6 @@ public class SubsamplingScaleImageView extends View {
 
     /**
      * Sets right extra space for the view in view pixels.
-     *
      * @see #setExtraSpace(float, float, float, float)
      */
     public void setExtraSpaceRight(float vRight) {
@@ -2148,8 +2142,8 @@ public class SubsamplingScaleImageView extends View {
     }
 
     /**
-     * @return bottom extra space in view pixels
      * @see #setExtraSpace(float, float, float, float)
+     * @return bottom extra space in view pixels
      */
     public float getExtraSpaceBottom() {
         return vExtraSpaceBottom;
@@ -2157,7 +2151,6 @@ public class SubsamplingScaleImageView extends View {
 
     /**
      * Sets bottom extra space for the view in view pixels.
-     *
      * @see #setExtraSpace(float, float, float, float)
      */
     public void setExtraSpaceBottom(float vBottom) {
@@ -2421,7 +2414,7 @@ public class SubsamplingScaleImageView extends View {
      * strongly recommended to use a single executor instance for the life of your application, not
      * one per view instance.
      * </p><p>
-     * <b>Warning:</b> If you are using a custom implementation of {@link ImageRegionDecoder}, and you
+     * <b>Warning:</b> If you are using a custom implementation of {@link Decoder}, and you
      * supply an executor with more than one thread, you must make sure your implementation supports
      * multi-threaded bitmap decoding or has appropriate internal synchronization. From SDK 21, Android's
      * {@link android.graphics.BitmapRegionDecoder} uses an internal lock so it is thread safe but
@@ -2660,7 +2653,7 @@ public class SubsamplingScaleImageView extends View {
         private final WeakReference<SubsamplingScaleImageView> viewRef;
         private final WeakReference<Context> contextRef;
         private final WeakReference<InputProvider> providerRef;
-        private ImageRegionDecoder decoder;
+        private Decoder decoder;
         private Exception exception;
 
         TilesInitTask(SubsamplingScaleImageView view, Context context, InputProvider provider) {
@@ -2677,7 +2670,7 @@ public class SubsamplingScaleImageView extends View {
                 InputProvider provider = providerRef.get();
                 if (context != null && view != null && provider == view.provider) {
                     view.debug("TilesInitTask.doInBackground");
-                    decoder = new Decoder(view.cropBorders);
+                    decoder = new ImageDecoder(view.cropBorders);
                     Point dimensions = decoder.init(context, provider);
                     int sWidth = dimensions.x;
                     int sHeight = dimensions.y;
@@ -2717,11 +2710,11 @@ public class SubsamplingScaleImageView extends View {
      */
     private static class TileLoadTask extends AsyncTask<Void, Void, Bitmap> {
         private final WeakReference<SubsamplingScaleImageView> viewRef;
-        private final WeakReference<ImageRegionDecoder> decoderRef;
+        private final WeakReference<Decoder> decoderRef;
         private final WeakReference<Tile> tileRef;
         private Exception exception;
 
-        TileLoadTask(SubsamplingScaleImageView view, ImageRegionDecoder decoder, Tile tile) {
+        TileLoadTask(SubsamplingScaleImageView view, Decoder decoder, Tile tile) {
             this.viewRef = new WeakReference<>(view);
             this.decoderRef = new WeakReference<>(decoder);
             this.tileRef = new WeakReference<>(tile);
@@ -2732,7 +2725,7 @@ public class SubsamplingScaleImageView extends View {
         protected Bitmap doInBackground(Void... params) {
             try {
                 SubsamplingScaleImageView view = viewRef.get();
-                ImageRegionDecoder decoder = decoderRef.get();
+                Decoder decoder = decoderRef.get();
                 Tile tile = tileRef.get();
                 if (decoder != null && tile != null && view != null && decoder.isReady() && tile.visible) {
                     view.debug("TileLoadTask.doInBackground, tile.sRect=%s, tile.sampleSize=%d", tile.sRect, tile.sampleSize);
@@ -3038,6 +3031,4 @@ public class SubsamplingScaleImageView extends View {
             invalidate();
         }
     }
-
-
 }
