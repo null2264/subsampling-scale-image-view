@@ -19,17 +19,11 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v4
 
-      - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v2
-
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: adopt
-
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: null2264/actions/gradle-setup@6712f98d592b126629afd27dc4870c93b53426b4
+        with:
+          java: 17
+          distro: adopt
 
       - name: Build app
         run: ./gradlew assemble
